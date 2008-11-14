@@ -2,8 +2,8 @@
 // @name            Fluid Twitter
 // @namespace       http://brionesandco.com/ryabriones
 // @description     Streamline the Twitter interface to be nicer in a Fluid Instance
-// @include         http://twitter.tld/*
-// @version         0.1
+// @include         http://twitter.tld/home*
+// @version         0.2
 // @author          Ryan Carmelo Briones (modified by Brian Anderson - banderson623@gmail.com)
 // @homepage        http://brionesandco.com/ryabriones 
 // ==/UserScript==

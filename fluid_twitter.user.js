@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 var FluidTwitterPlus = Class.create({
-  seconds_to_refresh: 60,
+  seconds_to_refresh: 60 * 5,
   new_tweets_to_view: true,
   latest_growled_id: "",
   latest_seen_id: "",

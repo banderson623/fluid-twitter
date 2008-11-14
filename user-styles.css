@@ -1,0 +1,23 @@
+#side_base,
+.elections-promotion,
+#navigation,
+#footer,
+#header,
+.content-bubble-arrow
+{
+	display:none !important;
+}
+
+.hentry td.status-body div,
+#currently {
+	width:auto !important;
+}
+
+span.meta.entry-meta {
+	visibility: hidden !important;
+}
+
+td.status-body:hover span.meta.entry-meta {
+	visibility: visible !important;
+
+}

@@ -9,14 +9,24 @@ Installation
 ===============
 (Assuming you've already downloaded Fluid from Fluidapp.com)
 
-1. Create a new Fluid SSB
--- URL: http://twitter.com/home (you could also use http://twitter.com/username, but home will redirect you to the login as necessary)
-2. Run the Fluid SSB you just created
-3. In the menu, navigate to Userscripts -> Open Userscripts Folder
-4. Paste fluid_twitter.user.js into the SSB's Userscript folder
-5. In the menu of your SSB navigate to Userscripts -> Reload All Userscripts
-6. Navigate to Userscripts -> Fluid Twitter to toggle it's enablement (is that a word?)
-7. Use Cmd-R to reload SSB window
+1.  Create a new Fluid SSB
+ -- URL: http://twitter.com/home (you could also use http://twitter.com/username, but home will redirect you to the login as necessary)
+2.  Run the Fluid SSB you just created
+3.  In the menu, navigate to Userscripts -> Open Userscripts Folder
+4.  Paste fluid_twitter.user.js into the SSB's Userscript folder
+5.  In the menu of your SSB navigate to Userscripts -> Reload All Userscripts
+6.  Navigate to Userscripts -> Fluid Twitter to toggle it's enablement (is that a word?)
+7.  Use Cmd-R to reload SSB window
+
+You Win!
+
+Optional
+===============
+8.  Open Twitter -> Preferences.
+9.  Go to tab Userstyles.
+10. Click the plus
+11. Assign the URL Pattern to "*twitter.com/home*" and check the box
+12. Paste in the contents of user-style.css
 
 You Win!
 

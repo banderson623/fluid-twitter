@@ -14,11 +14,11 @@ var FluidTwitterPlus = Class.create({
   latest_growled_id: "",
   latest_seen_id: "",
   me: "",
-  debug: true,
+  debug: false,
 
   initialize: function() {
-    this.latest_seen_id =    this.tweets()[1].id;
-    this.latest_growled_id = this.tweets()[1].id;
+    this.latest_seen_id =    this.tweets()[0].id;
+    this.latest_growled_id = this.tweets()[0].id;
     this.me = $$('meta[name=session-user-screen_name]').first().content;
     setTimeout(this.refreshTwitter.bind(this), this.seconds_to_refresh * 1000);
     this.observeAppFocus();

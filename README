@@ -2,7 +2,13 @@ Fluid Twitter
 ===============
 
 A Userscript for Fluid that streamlines the twitter interface to
-make it usable in a flexible (but mostly thin) Fluid instance
+make it usable in a flexible (but mostly thin) Fluid instance.
+
+Features:
+* Beep on new tweet
+* Check for tweets every 1, 5, 15 or 30 minutes via XHR
+* Display new tweets on growl
+* Update the dock-icon badge to show un-viewed tweets.
 
 
 Installation

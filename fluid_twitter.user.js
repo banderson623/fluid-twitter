@@ -13,23 +13,57 @@ var FluidTwitterPlus = Class.create({
   new_tweets_to_view: true,
   latest_growled_id: "",
   latest_seen_id: "",
+  show_updates_with_growl: true,
+  beep_on_update: true,
   me: "",
   debug: false,
 
   initialize: function() {
-    this.latest_seen_id =    this.tweets()[0].id;
-    this.latest_growled_id = this.tweets()[0].id;
+    this.latest_seen_id =    this.tweets()[2].id;
+    this.latest_growled_id = this.tweets()[2].id;
     this.me = $$('meta[name=session-user-screen_name]').first().content;
     setTimeout(this.refreshTwitter.bind(this), this.seconds_to_refresh * 1000);
+    this.buildConfig();
     this.observeAppFocus();
     this.refreshTwitter();
   },
+  
+  buildConfig: function() {
+    if(this.debug) this.growl("buildConfig", "building");
+    var fv = '<form id="fluid_twitter_config" style="margin-top:10px;">';
 
+        fv += '<label for="fluid_reload">Refresh every </label>';
+        fv += '<select name="fluid_reload" id="fluid_reload"><option value="1">1 minute (debug only)</option><option selected="selected" value="5">5 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option></select>';
+        fv += '<br />';
+    
+        fv += '<input type="checkbox" name="display_new_tweets_with_growl" checked="checked" value="1" id="display_new_tweets_with_growl"> <label for="display_new_tweets_with_growl">Display New Tweets with Growl</label>';
+        fv += '<br />';
+        fv += '<input type="checkbox" name="beep_on_new_tweets" checked="checked" value="1" id="beep_on_new_tweets"> <label for="beep_on_new_tweets">Beep on new Tweets</label>';
+        fv += '<br />';
+        
+        fv += '</form>';    
+    $('timeline').next('div.bottom_nav').insert({bottom:fv});
+    $('fluid_twitter_config').observe('change', function(){
+      this.changeConfig();
+    }.bind(this));
+  },
+  
+  changeConfig: function(){
+    this.growl("FluidTwitterPlus", "Config Changed");
+    this.seconds_to_refresh = $F('fluid_reload') * 60;
+    
+    this.show_updates_with_growl = $F('display_new_tweets_with_growl') ? true : false;
+    this.beep_on_update =          $F('beep_on_new_tweets') ? true : false;
+    
+    this.refreshTwitter();
+  },
+  
   refreshTwitter: function() {
     $('home_tab').onclick();
     this.new_tweets_to_view = true;
     if(this.debug) this.growl("Refreshing","!");
     this.updateBadge();
+    this.beeper();
     this.growlize();
     setTimeout(this.refreshTwitter.bind(this), this.seconds_to_refresh * 1000);
   },
@@ -77,9 +111,17 @@ var FluidTwitterPlus = Class.create({
       var name = tweet.down('strong a').title;
       var display_name = tweet.down('strong a').innerHTML.strip();
       var tweet = tweet.down('.entry-content').innerHTML.strip().stripTags().truncate(100);
-      this.growl(display_name,tweet);
+      if(this.show_updates_with_growl) this.growl(display_name,tweet);
       this.latest_growled_id = tweet.id;
     }.bind(this));
+  },
+  
+  beeper: function(){
+    if(this.debug) this.growl("Beeper", "checking to beep");
+    if(this.newTweetsFrom(this.latest_growled_id).length > 0 && this.beep_on_update){
+      if(this.debug) this.growl("Beeper", "BEEP!");
+      window.fluid.beep();
+    }
   },
 
   tweets: function(){

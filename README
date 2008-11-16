@@ -40,3 +40,7 @@ You Win!
 Caveats
 ===============
 * As of FluidInstance 0.8.2, SSB's will not persist the enablement of your Userscripts. Translation: you will have to enable Fluid Twitter every time you open your SSB
+
+To Do
+===============
+* Change, so your own updates aren't causing a growl notification, dock-badge change, or beep.

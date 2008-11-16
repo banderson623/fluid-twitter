@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name            Fluid Twitter
+// @name            Fluid Twitter ++
 // @namespace       http://brionesandco.com/ryabriones
-// @description     Streamline the Twitter interface to be nicer in a Fluid Instance
+// @description     Streamline the Twitter interface to be nicer in a Fluid Instance, with ajax update, growl and dock-icon badges
 // @include         http://twitter.tld/home*
 // @version         0.2
 // @author          Ryan Carmelo Briones (modified by Brian Anderson - banderson623@gmail.com)
@@ -13,14 +13,16 @@ var FluidTwitterPlus = Class.create({
   new_tweets_to_view: true,
   latest_growled_id: "",
   latest_seen_id: "",
-  debug: false,
+  me: "",
+  debug: true,
 
   initialize: function() {
-    this.latest_seen_id =    this.tweets()[0].id;
-    this.latest_growled_id = this.tweets()[0].id;
-
+    this.latest_seen_id =    this.tweets()[1].id;
+    this.latest_growled_id = this.tweets()[1].id;
+    this.me = $$('meta[name=session-user-screen_name]').first().content;
     setTimeout(this.refreshTwitter.bind(this), this.seconds_to_refresh * 1000);
     this.observeAppFocus();
+    this.refreshTwitter();
   },
 
   refreshTwitter: function() {
@@ -81,7 +83,11 @@ var FluidTwitterPlus = Class.create({
   },
 
   tweets: function(){
-    return $('timeline_body').select('.status');
+    var tweets = $('timeline_body').select('.status');
+    tweets.reject(function(t){
+      return (t.down('td.status-body div a').innerHTML == this.me)
+    }.bind(this));
+    return tweets;
   },
 
   growl: function(title_string, messages){

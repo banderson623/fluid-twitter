@@ -33,7 +33,7 @@ var FluidTwitterPlus = Class.create({
     var fv = '<form id="fluid_twitter_config" style="margin-top:10px;">';
 
         fv += '<label for="fluid_reload">Refresh every </label>';
-        fv += '<select name="fluid_reload" id="fluid_reload"><option value="1">1 minute (debug only)</option><option selected="selected" value="5">5 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option></select>';
+        fv += '<select name="fluid_reload" id="fluid_reload"><option value="1">1 minute</option><option value="2">2 minutes</option><option selected="selected" value="5">5 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option></select>';
         fv += '<br />';
     
         fv += '<input type="checkbox" name="display_new_tweets_with_growl" checked="checked" value="1" id="display_new_tweets_with_growl"> <label for="display_new_tweets_with_growl">Display New Tweets with Growl</label>';

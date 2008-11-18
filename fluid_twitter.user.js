@@ -9,7 +9,8 @@
 // ==/UserScript==
 
 var FluidTwitterPlus = Class.create({
-  seconds_to_refresh: 60 * 5,
+  // seconds_to_refresh: 60 * 5,
+  seconds_to_refresh: 10,
   new_tweets_to_view: true,
   latest_growled_id: "",
   latest_seen_id: "",
@@ -19,11 +20,13 @@ var FluidTwitterPlus = Class.create({
   debug: false,
 
   initialize: function() {
-    this.latest_seen_id =    this.tweets()[0].id;
-    this.latest_growled_id = this.tweets()[0].id;
+    this.latest_seen_id =    this.staleTweets()[2].id;
+    this.latest_growled_id = this.staleTweets()[2].id;
     this.me = $$('meta[name=session-user-screen_name]').first().content;
+    this.timeline_body = $$('#timeline #timeline_body')[0];
     setTimeout(this.refreshTwitter.bind(this), this.seconds_to_refresh * 1000);
     this.buildConfig();
+    this.setupFakeTimeline();
     this.observeAppFocus();
     this.refreshTwitter();
   },
@@ -59,12 +62,11 @@ var FluidTwitterPlus = Class.create({
   },
   
   refreshTwitter: function() {
-    $('home_tab').onclick();
+    this.XHRNewTweets();
     this.new_tweets_to_view = true;
     if(this.debug) this.growl("Refreshing","!");
     this.updateBadge();
-    this.beeper();
-    this.growlize();
+    this.discoverNewTweets();
     setTimeout(this.refreshTwitter.bind(this), this.seconds_to_refresh * 1000);
   },
 
@@ -72,7 +74,7 @@ var FluidTwitterPlus = Class.create({
     if(this.debug) this.growl('Load', 'observeAppFocus loaded');
     Event.observe(document,'mousemove', function(){
       if(this.new_tweets_to_view){
-        this.latest_seen_id = this.tweets()[0].id;
+        this.latest_seen_id = this.xhrTweets()[0].id;
         if(this.debug) this.growl('DOM', 'mousemove');
         this.updateBadge();
         this.new_tweets_to_view = false;
@@ -86,7 +88,7 @@ var FluidTwitterPlus = Class.create({
 
   newTweetsFrom: function(id){
     var last_seen = 0;
-    var tweets = this.tweets();
+    var tweets = this.xhrTweets();
     for(var i=0; i<tweets.length; i++){
       if(tweets[i].id == id){
         return tweets.slice(0,i);
@@ -106,29 +108,44 @@ var FluidTwitterPlus = Class.create({
 
   },
 
-  growlize: function(){
+  discoverNewTweets: function(){
     this.newTweetsFrom(this.latest_growled_id).each(function(tweet){
-      var name = tweet.down('strong a').title;
-      var display_name = tweet.down('strong a').innerHTML.strip();
-      var tweet = tweet.down('.entry-content').innerHTML.strip().stripTags().truncate(100);
-      if(this.show_updates_with_growl) this.growl(display_name,tweet);
+      if(this.show_updates_with_growl){
+        var name = tweet.down('strong a').title;
+        var display_name = tweet.down('strong a').innerHTML.strip();
+        var tweet = tweet.down('.entry-content').innerHTML.strip().stripTags().truncate(100);
+        
+        this.growl(display_name,tweet);
+      }
+      
+      if(this.beep_on_update){
+        window.fluid.beep();
+      }
+      
+      this.pushToTimeline(tweet);
+      
       this.latest_growled_id = tweet.id;
     }.bind(this));
   },
   
-  beeper: function(){
-    if(this.debug) this.growl("Beeper", "checking to beep");
-    if(this.newTweetsFrom(this.latest_growled_id).length > 0 && this.beep_on_update){
-      if(this.debug) this.growl("Beeper", "BEEP!");
-      window.fluid.beep();
-    }
+  pushToTimeline: function(tweet){
+    this.growl("pushing", "to timeline " + $(tweet).id);  
+    // var new_tweet = '<tr id="new_'+$(tweet).id+'" style="display:snone;" class = "' + $(tweet).classNames().join(' ') + '">' + $(tweet).innerHTML + '</tr>';
+    // this.timeline_body.insert({top:new_tweet});
+        
+    // this.growl("pushing", "done");
+    
+    // $(tweet).hide();
+    // $('timeline-body').insert({top:$(tweet)});
+
+  },
+  
+  staleTweets: function(){
+    return $('timeline').select('.status');
   },
 
-  tweets: function(){
-    var tweets = $('timeline_body').select('.status');
-    tweets.reject(function(t){
-      return (t.down('td.status-body div a').innerHTML == this.me)
-    }.bind(this));
+  xhrTweets: function(){
+    var tweets = $('fake_timeline').select('.status');
     return tweets;
   },
 
@@ -137,7 +154,39 @@ var FluidTwitterPlus = Class.create({
       title: title_string, 
       description: messages
     });
+  },
+  
+  // ----------------------------------------------------------------------
+  
+  setupFakeTimeline: function(){
+    if(this.debug) this.growl("2.0", "Setup fake timeline");
+    $('home').insert({bottom:'<div id="fake_timeline" style="display:none;"></div>'});
+    
+    // eval('function put_in_fake_timeline(response){var nr = response.sub(\'"timeline"\',\'"fake_timeline"\');eval(nr);}');
+    window.put_in_fake_timeline = function(response){ 
+                                             // alert(response);
+                                             var nr = response.sub('replace', 'update').sub('window.scroll(0,0);','').sub('"timeline"','"fake_timeline"') ;
+                                             eval(nr);
+                                            }
+    
+    
+    this.auth_token = $F('authenticity_token');
+    if(this.debug) this.growl("Auth token", "Found auth token: " + this.auth_token);
+  },
+  
+  
+  XHRNewTweets: function(){
+    if(this.debug) this.growl("XHR", "fetching");
+    this.growl("XHR", "Fetch")
+    new Ajax.Request('http://twitter.com/home', 
+                    { asynchronous:true,
+                      evalScripts:false,
+                      parameters:'authenticity_token=' + encodeURIComponent($F('authenticity_token')), 
+                      onSuccess: function(transport) {put_in_fake_timeline(transport.responseText);}
+                    });
   }
+  
+  
   
  
 });
